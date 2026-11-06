@@ -225,7 +225,7 @@ function load(i,autoplay=false){
  $('nowTitle').textContent=tracks[current].title;
  $('chapterLine').textContent=current===0?'The Deepest Part of the Ocean':'Chapter '+current+' of '+(tracks.length-1);
  $('status').textContent='Ready to play';setProg(0);$('currentTime').textContent='0:00';$('duration').textContent='0:00';
- render();markReader(true);updateDepth();
+ render();markReader(true);updateDepth();updateMeta();
  safe(()=>localStorage.setItem('dpo-track',current));
  if(autoplay)audio.play().catch(()=>{$('status').textContent='Press play to start'});
 }
@@ -278,6 +278,39 @@ $('toTop').addEventListener('click',()=>{markReader(true)});
   requestAnimationFrame(tick);
  })();
 })();
+
+/* OS media controls (lock screen, notification shade, media keys, Bluetooth) */
+function updateMeta(){
+ if(!('mediaSession' in navigator))return;
+ const art=new URL(coverSrc,location.href).href;
+ navigator.mediaSession.metadata=new MediaMetadata({
+  title:tracks[current].title,
+  artist:'Gio Becerra',
+  album:'The Deepest Part of the Ocean'+(current>0?' — Chapter '+current:''),
+  artwork:[{src:art,sizes:'630x1134',type:'image/jpeg'}]
+ });
+}
+function updatePos(){
+ if(!('mediaSession' in navigator)||!navigator.mediaSession.setPositionState)return;
+ if(!audio.duration||!Number.isFinite(audio.duration))return;
+ try{navigator.mediaSession.setPositionState({duration:audio.duration,playbackRate:audio.playbackRate||1,position:Math.min(audio.currentTime,audio.duration)})}catch(e){}
+}
+if('mediaSession' in navigator){
+ const ms=navigator.mediaSession,set=(n,f)=>{try{ms.setActionHandler(n,f)}catch(e){}};
+ set('play',()=>audio.play());
+ set('pause',()=>audio.pause());
+ set('previoustrack',()=>$('prev').click());
+ set('nexttrack',()=>$('next').click());
+ set('seekbackward',d=>{audio.currentTime=Math.max(0,audio.currentTime-((d&&d.seekOffset)||15))});
+ set('seekforward',d=>{audio.currentTime=Math.min(audio.duration||1e9,audio.currentTime+((d&&d.seekOffset)||15))});
+ set('seekto',d=>{if(d.fastSeek&&'fastSeek' in audio)audio.fastSeek(d.seekTime);else audio.currentTime=d.seekTime;updatePos()});
+ audio.addEventListener('play',()=>{ms.playbackState='playing';updatePos()});
+ audio.addEventListener('pause',()=>{ms.playbackState='paused';updatePos()});
+ audio.addEventListener('loadedmetadata',updatePos);
+ audio.addEventListener('seeked',updatePos);
+ audio.addEventListener('ratechange',updatePos);
+}
+updateMeta();
 
 let start=0;safe(()=>{const t=+localStorage.getItem('dpo-track');if(t>=0&&t<tracks.length)start=t});
 load(start);
