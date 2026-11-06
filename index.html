@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2b2b2b">
+<title>Gio's Random Uploads — Archive</title>
+<meta name="description" content="Gio's Random Uploads — an archive. A part of Gio's Wacky Projects.">
+<style>
+:root{--paper:#f3efe4;--card:#fbf9f2;--ink:#1d1b17;--muted:#6d675a;--rule:#cfc8b6;--bar:#2b2b2b;--link:#0b4f8a;--stamp:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--link)}
+.mono{font-family:'Courier New',ui-monospace,Menlo,monospace}
+.topbar{background:var(--bar);color:#e9e4d4;font-family:'Courier New',monospace;font-size:13px;padding:9px 5vw;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.topbar a{color:#ffd96b;text-decoration:none}.topbar a:hover{text-decoration:underline}
+header{border-bottom:3px double var(--ink);padding:30px 5vw 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.logo{font-size:clamp(30px,5vw,48px);font-weight:700;letter-spacing:-.02em;line-height:1}
+.logo small{display:block;font-family:'Courier New',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:8px}
+.stamp{text-decoration:none;font-family:'Courier New',monospace;font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--stamp);border:2px solid var(--stamp);padding:5px 10px;transform:rotate(-3deg);text-transform:uppercase;opacity:.85}
+main{flex:1;width:100%;max-width:1000px;margin:0 auto;padding:26px 5vw 40px}
+.crumbs{font-family:'Courier New',monospace;font-size:13px;color:var(--muted);margin-bottom:18px}
+.tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.tools input{flex:1;min-width:200px;font:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--ink);background:#fff;border-radius:2px}
+.tools input:focus{outline:2px solid var(--link);outline-offset:1px}
+.count{font-family:'Courier New',monospace;font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--ink)}
+th{font-family:'Courier New',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-align:left;background:#e5dfcd;border-bottom:2px solid var(--ink);padding:9px 12px}
+td{padding:14px 12px;border-bottom:1px solid var(--rule);vertical-align:top;font-size:15px}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#fff6d6}
+tr.row:last-child td{border-bottom:0}
+.id{font-family:'Courier New',monospace;color:var(--muted);white-space:nowrap}
+.title a{font-size:18px;font-weight:700;text-decoration:none}.title a:hover{text-decoration:underline}
+.desc{color:var(--muted);font-size:14px;margin-top:3px}
+.tag{display:inline-block;font-family:'Courier New',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--ink);padding:1px 6px;margin-right:4px;background:#fff}
+.meta{font-family:'Courier New',monospace;font-size:13px;white-space:nowrap}
+.thumb{width:54px;height:auto;border:1px solid var(--ink);display:block;filter:sepia(.25)}
+.empty{padding:26px;text-align:center;color:var(--muted);font-style:italic}
+.note{margin-top:22px;font-family:'Courier New',monospace;font-size:12px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:14px}
+footer{background:var(--bar);color:#b9b3a1;font-family:'Courier New',monospace;font-size:12px;padding:18px 5vw;text-align:center}
+footer a{color:#ffd96b}
+@media(max-width:680px){th.c-thumb,td.c-thumb,th.c-meta,td.c-meta{display:none}td{padding:12px 8px}}
+</style>
+</head>
+<body>
+<div class="topbar"><span>ARCHIVE &gt; RANDOM UPLOADS</span><a href="https://gios-projects.pages.dev" target="_blank" rel="noopener">← Gio's Wacky Projects</a></div>
+<header>
+  <div class="logo"><small>The Collection of</small>Gio's Random Uploads</div>
+  <a class="stamp" href="https://gios-projects.pages.dev" target="_blank" rel="noopener">Part of Gio's Wacky Projects</a>
+</header>
+<main>
+  <div class="crumbs">gios-projects / <b>random-uploads</b> /</div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search the archive…" aria-label="Search the archive">
+    <span class="count" id="count"></span>
+  </div>
+  <table>
+    <thead><tr><th>No.</th><th class="c-thumb"></th><th>Item</th><th class="c-meta">Added</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="note">An archive of things Gio made and uploaded. Items are added over time. Part of <a href="https://gios-projects.pages.dev" target="_blank" rel="noopener">Gio's Wacky Projects</a>.</div>
+</main>
+<footer>GIO'S RANDOM UPLOADS · A PART OF <a href="https://gios-projects.pages.dev" target="_blank" rel="noopener">GIO'S WACKY PROJECTS</a> · ✦ cRäZy!_CüStØm ✦</footer>
+
+<script>
+/* ADD NEW UPLOADS HERE — newest first.
+   1. Put the files in  media/<your-folder>/
+   2. Make a page at   <your-folder>/index.html
+   3. Add an entry below.                                   */
+const uploads = [
+  {
+    title: "The Deepest Part of the Ocean",
+    tags: ["Audiobook", "Fan story"],
+    desc: "A fan-made SpongeBob adventure written by Gio Becerra. 12 chapters with audio and the full story text.",
+    cover: "media/deepest-part/cover.jpeg",
+    href: "deepest-part/index.html",
+    added: "2026-11-05"
+  }
+];
+const rows=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function draw(){
+  const t=q.value.trim().toLowerCase();
+  const list=uploads.map((u,i)=>({u,n:uploads.length-i})).filter(({u})=>!t||(u.title+' '+u.desc+' '+(u.tags||[]).join(' ')).toLowerCase().includes(t));
+  count.textContent=list.length+' of '+uploads.length+(uploads.length===1?' item':' items');
+  rows.innerHTML=list.length?list.map(({u,n})=>`<tr class="row" data-href="${esc(u.href)}"><td class="id">${String(n).padStart(4,'0')}</td><td class="c-thumb">${u.cover?`<img class="thumb" src="${esc(u.cover)}" alt="">`:''}</td><td class="title"><a href="${esc(u.href)}">${esc(u.title)}</a><div class="desc">${esc(u.desc||'')}</div><div style="margin-top:7px">${(u.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div></td><td class="c-meta meta">${esc(u.added||'')}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No items match your search.</td></tr>';
+}
+rows.addEventListener('click',e=>{const r=e.target.closest('tr.row');if(r&&!e.target.closest('a'))location.href=r.dataset.href});
+q.addEventListener('input',draw);draw();
+</script>
+</body>
+</html>
